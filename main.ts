@@ -10,7 +10,7 @@ async function main() {
   await prisma.post.create({ data: { postId: 'post-3', feedDomain: 'reddit.com', feedName: 'aww' } })
 
   await prisma.tag.create({ data: { tag: 'tag-1' } })
-  
+
   await prisma.tag.create({ data: { tag: 'tag-2' } })
 
   const post1 = await prisma.post.findFirst({
@@ -37,7 +37,9 @@ async function main() {
   })
 
   const posts = await prisma.post.findMany({
-    where: { tags: { some: { tag: { in: ['tag-1', 'tag-2'] } } } },
+    where: {
+      AND: [{ tags: { some: { tag: 'tag-1' } } }, { tags: { some: { tag: 'tag-2' } } }],
+    },
     include: { tags: true },
   })
 
