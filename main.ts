@@ -7,19 +7,37 @@ async function main() {
 
   await prisma.post.create({ data: { postId: 'post-2', feedDomain: 'reddit.com', feedName: 'aww' } })
 
-  await prisma.tag.create({ data: { tag: 'tag-1' } })
+  await prisma.post.create({ data: { postId: 'post-3', feedDomain: 'reddit.com', feedName: 'aww' } })
 
-  const post = await prisma.post.findFirst({
+  await prisma.tag.create({ data: { tag: 'tag-1' } })
+  
+  await prisma.tag.create({ data: { tag: 'tag-2' } })
+
+  const post1 = await prisma.post.findFirst({
     where: { postId: 'post-1', feedDomain: 'reddit.com', feedName: 'aww' },
   })
 
   await prisma.post.update({
-    where: { uniqueId: post?.uniqueId as string },
+    where: { uniqueId: post1?.uniqueId as string },
     data: { tags: { connect: { tag: 'tag-1' } } },
   })
 
+  await prisma.post.update({
+    where: { uniqueId: post1?.uniqueId as string },
+    data: { tags: { connect: { tag: 'tag-2' } } },
+  })
+
+  const post2 = await prisma.post.findFirst({
+    where: { postId: 'post-2', feedDomain: 'reddit.com', feedName: 'aww' },
+  })
+
+  await prisma.post.update({
+    where: { uniqueId: post2?.uniqueId as string },
+    data: { tags: { connect: { tag: 'tag-2' } } },
+  })
+
   const posts = await prisma.post.findMany({
-    where: { tags: { every: { tag: { in: ['tag-1'] } } } },
+    where: { tags: { some: { tag: { in: ['tag-1', 'tag-2'] } } } },
     include: { tags: true },
   })
 
